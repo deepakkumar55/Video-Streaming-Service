@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { notFound } from 'next/navigation';
 import CertificationHeader from '@/components/certification/CertificationHeader';
 import CertificationOverview from '@/components/certification/CertificationOverview';
@@ -546,174 +544,163 @@ interface Review {
   helpfulCount: number;
 }
 
-// Fixed: Using correct Next.js App Router prop type
-export default function CertificationPage({
-  params
-}: {
-  params: { slug: string }
-}) {
-  const { slug } = params;
-  const [certification, setCertification] = useState<CertificationData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+// Fix the type definition for the page component
+export default function CertificationPage({ params }: { params: { slug: string } }) {
+  // Instead of using client-side state, get the data server-side
+  const slug = params.slug;
+  const certificationData = getCertificationDetails(slug) as CertificationData;
   
-  useEffect(() => {
-    try {
-      const certificationData = getCertificationDetails(slug) as CertificationData;
-      setCertification(certificationData);
-      setLoading(false);
-    } catch (_) {
-      // Error is caught but not used
-      setLoading(false);
-      notFound();
-    }
-  }, [slug]);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  if (!certification) {
+  if (!certificationData) {
     return notFound();
   }
 
+  // Use client components for interactive elements
   return (
     <div className="bg-white dark:bg-gray-900 min-h-screen pb-12">
       {/* Certification header with banner */}
-      {certification && (
-        <>
-          <CertificationHeader 
-            name={certification.name}
-            description={certification.description}
-            banner={certification.banner}
-            icon={certification.icon}
-            color={certification.color}
-            difficulty={certification.difficulty}
-            duration={certification.duration}
-            cost={certification.cost}
-            validityPeriod={certification.validityPeriod}
-          />
+      <CertificationHeader 
+        name={certificationData.name}
+        description={certificationData.description}
+        banner={certificationData.banner}
+        icon={certificationData.icon}
+        color={certificationData.color}
+        difficulty={certificationData.difficulty}
+        duration={certificationData.duration}
+        cost={certificationData.cost}
+        validityPeriod={certificationData.validityPeriod}
+      />
+      
+      <div className="max-w-screen-xl mx-auto px-4 lg:px-8 pt-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            {/* Client component that handles its own state */}
+            <CertificationTabsContainer 
+              certification={certificationData}
+            />
+          </div>
           
-          <div className="max-w-screen-xl mx-auto px-4 lg:px-8 pt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2">
-                {/* Certification tabs for navigation */}
-                <CertificationTabs 
-                  activeTab={activeTab} 
-                  setActiveTab={setActiveTab}
-                />
+          <div className="lg:col-span-1">
+            {/* Certification enrollment card */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 sticky top-24">
+              <h3 className="text-xl font-semibold mb-4">Certification Details</h3>
+              
+              <div className="space-y-4">
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Cost</span>
+                  <span className="font-semibold">{certificationData.cost}</span>
+                </div>
                 
-                {/* Tab content */}
-                <div className="mt-6">
-                  {activeTab === 'overview' && (
-                    <CertificationOverview 
-                      description={certification.longDescription}
-                      skills={certification.skills}
-                      benefits={certification.benefits}
-                    />
-                  )}
-                  
-                  {activeTab === 'requirements' && (
-                    <CertificationRequirements 
-                      prerequisites={certification.prerequisites}
-                      examTopics={certification.examTopics}
-                    />
-                  )}
-                  
-                  {activeTab === 'exam' && (
-                    <CertificationExam 
-                      examFormat={certification.examFormat}
-                      passRate={certification.passRate}
-                      faqs={certification.faqs}
-                    />
-                  )}
-                  
-                  {activeTab === 'courses' && (
-                    <CertificationCourses 
-                      courses={certification.recommendedCourses}
-                    />
-                  )}
-                  
-                  {activeTab === 'reviews' && (
-                    <CertificationReviews 
-                      reviews={certification.reviews}
-                    />
-                  )}
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Difficulty</span>
+                  <span className="font-semibold">{certificationData.difficulty}</span>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Exam Duration</span>
+                  <span className="font-semibold">{certificationData.duration}</span>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Pass Rate</span>
+                  <span className="font-semibold">{certificationData.passRate}</span>
+                </div>
+                
+                <div className="flex justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">Validity Period</span>
+                  <span className="font-semibold">{certificationData.validityPeriod}</span>
                 </div>
               </div>
               
-              <div className="lg:col-span-1">
-                {/* Certification enrollment card */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 sticky top-24">
-                  <h3 className="text-xl font-semibold mb-4">Certification Details</h3>
-                  
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Cost</span>
-                      <span className="font-semibold">{certification.cost}</span>
-                    </div>
-                    
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Difficulty</span>
-                      <span className="font-semibold">{certification.difficulty}</span>
-                    </div>
-                    
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Exam Duration</span>
-                      <span className="font-semibold">{certification.duration}</span>
-                    </div>
-                    
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Pass Rate</span>
-                      <span className="font-semibold">{certification.passRate}</span>
-                    </div>
-                    
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Validity Period</span>
-                      <span className="font-semibold">{certification.validityPeriod}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-6 space-y-4">
-                    <button className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors">
-                      Register for Exam
-                    </button>
-                    
-                    <button className="w-full py-3 border border-indigo-600 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:border-indigo-400 dark:hover:bg-indigo-900/20 font-medium rounded-lg transition-colors">
-                      Get Preparation Course
-                    </button>
-                  </div>
-                  
-                  <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <h4 className="font-medium mb-3">Why Get Certified?</h4>
-                    <ul className="space-y-2">
-                      {certification.benefits.slice(0, 3).map((benefit, index) => (
-                        <li key={index} className="flex items-start">
-                          <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                          </svg>
-                          <span className="text-gray-700 dark:text-gray-300">{benefit}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+              <div className="mt-6 space-y-4">
+                <button className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors">
+                  Register for Exam
+                </button>
                 
-                {/* Related certifications */}
-                <div className="mt-6">
-                  <CertificationRelated 
-                    certifications={certification.relatedCertifications}
-                  />
-                </div>
+                <button className="w-full py-3 border border-indigo-600 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:border-indigo-400 dark:hover:bg-indigo-900/20 font-medium rounded-lg transition-colors">
+                  Get Preparation Course
+                </button>
+              </div>
+              
+              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <h4 className="font-medium mb-3">Why Get Certified?</h4>
+                <ul className="space-y-2">
+                  {certificationData.benefits.slice(0, 3).map((benefit, index) => (
+                    <li key={index} className="flex items-start">
+                      <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-700 dark:text-gray-300">{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
+            
+            {/* Related certifications */}
+            <div className="mt-6">
+              <CertificationRelated 
+                certifications={certificationData.relatedCertifications}
+              />
+            </div>
           </div>
-        </>
-      )}
+        </div>
+      </div>
     </div>
+  );
+}
+
+// Create a client component for the tabs
+"use client";
+import { useState } from 'react';
+
+function CertificationTabsContainer({ certification }) {
+  const [activeTab, setActiveTab] = useState('overview');
+  
+  return (
+    <>
+      {/* Certification tabs for navigation */}
+      <CertificationTabs 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab}
+      />
+      
+      {/* Tab content */}
+      <div className="mt-6">
+        {activeTab === 'overview' && (
+          <CertificationOverview 
+            description={certification.longDescription}
+            skills={certification.skills}
+            benefits={certification.benefits}
+          />
+        )}
+        
+        {activeTab === 'requirements' && (
+          <CertificationRequirements 
+            prerequisites={certification.prerequisites}
+            examTopics={certification.examTopics}
+          />
+        )}
+        
+        {activeTab === 'exam' && (
+          <CertificationExam 
+            examFormat={certification.examFormat}
+            passRate={certification.passRate}
+            faqs={certification.faqs}
+          />
+        )}
+        
+        {activeTab === 'courses' && (
+          <CertificationCourses 
+            courses={certification.recommendedCourses}
+          />
+        )}
+        
+        {activeTab === 'reviews' && (
+          <CertificationReviews 
+            reviews={certification.reviews}
+          />
+        )}
+      </div>
+    </>
   );
 }
