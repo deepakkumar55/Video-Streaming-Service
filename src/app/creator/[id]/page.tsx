@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
 import InstructorHeader from '@/components/instructor/InstructorHeader';
 import InstructorTabs from '@/components/instructor/InstructorTabs';
 import InstructorCourses from '@/components/instructor/InstructorCourses';
@@ -114,24 +112,40 @@ I've helped over ${(instructorId + 10) * 10000} students worldwide advance their
   };
 };
 
-interface InstructorPageProps {
+// Define proper interface for creator data
+interface CreatorData {
+  id: string;
+  name: string;
+  avatar: string;
+  banner: string;
+  bio: string;
+  subscribersCount: number;
+  coursesCount: number;
+  videosCount: number;
+  rating: number;
+  reviewsCount: number;
+  verified: boolean;
+  // Add other properties as needed
+}
+
+interface CreatorPageProps {
   params: {
     id: string;
   };
 }
 
-export default function InstructorPage({ params }: InstructorPageProps) {
+export default function CreatorPage({ params }: CreatorPageProps) {
   const { id } = params;
-  const [instructor, setInstructor] = useState<any>(null);
+  const [creator, setCreator] = useState<CreatorData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('courses');
 
   useEffect(() => {
     try {
-      const instructorData = getInstructorDetails(id);
-      setInstructor(instructorData);
+      const creatorData = getInstructorDetails(id) as CreatorData;
+      setCreator(creatorData);
       setLoading(false);
-    } catch (error) {
+    } catch (_) {
+      // Error is caught but not used
       setLoading(false);
       notFound();
     }
@@ -145,7 +159,7 @@ export default function InstructorPage({ params }: InstructorPageProps) {
     );
   }
 
-  if (!instructor) {
+  if (!creator) {
     return notFound();
   }
 
@@ -153,17 +167,17 @@ export default function InstructorPage({ params }: InstructorPageProps) {
     <div className="bg-white dark:bg-gray-900 min-h-screen pb-12">
       {/* Instructor header with banner */}
       <InstructorHeader 
-        name={instructor.name}
-        title={instructor.title}
-        avatar={instructor.avatar}
-        coverImage={instructor.coverImage}
-        rating={instructor.rating}
-        reviewsCount={instructor.reviewsCount}
-        studentsCount={instructor.studentsCount}
-        coursesCount={instructor.coursesCount}
-        location={instructor.location}
-        specialization={instructor.specialization}
-        lastActive={instructor.lastActive}
+        name={creator.name}
+        title={creator.title}
+        avatar={creator.avatar}
+        coverImage={creator.coverImage}
+        rating={creator.rating}
+        reviewsCount={creator.reviewsCount}
+        studentsCount={creator.studentsCount}
+        coursesCount={creator.coursesCount}
+        location={creator.location}
+        specialization={creator.specialization}
+        lastActive={creator.lastActive}
       />
       
       <div className="max-w-screen-xl mx-auto px-4 lg:px-8 pt-6">
@@ -173,33 +187,33 @@ export default function InstructorPage({ params }: InstructorPageProps) {
             <InstructorTabs 
               activeTab={activeTab} 
               setActiveTab={setActiveTab}
-              coursesCount={instructor.coursesCount}
-              reviewsCount={instructor.reviewsCount} 
+              coursesCount={creator.coursesCount}
+              reviewsCount={creator.reviewsCount} 
             />
             
             {/* Tab content */}
             <div className="mt-6">
               {activeTab === 'courses' && (
                 <InstructorCourses 
-                  courses={instructor.courses}
-                  instructorName={instructor.name}
+                  courses={creator.courses}
+                  instructorName={creator.name}
                 />
               )}
               
               {activeTab === 'reviews' && (
                 <InstructorReviews 
-                  reviews={instructor.reviews}
-                  rating={instructor.rating}
-                  reviewsCount={instructor.reviewsCount}
+                  reviews={creator.reviews}
+                  rating={creator.rating}
+                  reviewsCount={creator.reviewsCount}
                 />
               )}
               
               {activeTab === 'about' && (
                 <InstructorAbout 
-                  bio={instructor.bio}
-                  languages={instructor.languages}
-                  joinedDate={instructor.joinedDate}
-                  socialLinks={instructor.socialLinks}
+                  bio={creator.bio}
+                  languages={creator.languages}
+                  joinedDate={creator.joinedDate}
+                  socialLinks={creator.socialLinks}
                 />
               )}
             </div>
@@ -213,18 +227,18 @@ export default function InstructorPage({ params }: InstructorPageProps) {
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Total Students</span>
-                  <span className="font-semibold">{instructor.studentsCount.toLocaleString()}</span>
+                  <span className="font-semibold">{creator.studentsCount.toLocaleString()}</span>
                 </div>
                 
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Reviews</span>
-                  <span className="font-semibold">{instructor.reviewsCount.toLocaleString()}</span>
+                  <span className="font-semibold">{creator.reviewsCount.toLocaleString()}</span>
                 </div>
                 
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Average Rating</span>
                   <div className="flex items-center">
-                    <span className="font-semibold mr-1">{instructor.rating.toFixed(1)}</span>
+                    <span className="font-semibold mr-1">{creator.rating.toFixed(1)}</span>
                     <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
@@ -233,26 +247,26 @@ export default function InstructorPage({ params }: InstructorPageProps) {
                 
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Total Courses</span>
-                  <span className="font-semibold">{instructor.coursesCount}</span>
+                  <span className="font-semibold">{creator.coursesCount}</span>
                 </div>
                 
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Languages</span>
-                  <span className="font-semibold">{instructor.languages}</span>
+                  <span className="font-semibold">{creator.languages}</span>
                 </div>
                 
                 <div className="flex justify-between">
                   <span className="text-gray-600 dark:text-gray-400">Joined</span>
-                  <span className="font-semibold">{instructor.joinedDate}</span>
+                  <span className="font-semibold">{creator.joinedDate}</span>
                 </div>
               </div>
               
               <div className="mt-6">
-                <h4 className="font-medium mb-3">Connect with {instructor.name.split(' ')[0]}</h4>
+                <h4 className="font-medium mb-3">Connect with {creator.name.split(' ')[0]}</h4>
                 <div className="flex space-x-3">
-                  {instructor.socialLinks.linkedin && (
+                  {creator.socialLinks.linkedin && (
                     <a 
-                      href={instructor.socialLinks.linkedin} 
+                      href={creator.socialLinks.linkedin} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
@@ -263,9 +277,9 @@ export default function InstructorPage({ params }: InstructorPageProps) {
                     </a>
                   )}
                   
-                  {instructor.socialLinks.twitter && (
+                  {creator.socialLinks.twitter && (
                     <a 
-                      href={instructor.socialLinks.twitter} 
+                      href={creator.socialLinks.twitter} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
@@ -276,9 +290,9 @@ export default function InstructorPage({ params }: InstructorPageProps) {
                     </a>
                   )}
                   
-                  {instructor.socialLinks.github && (
+                  {creator.socialLinks.github && (
                     <a 
-                      href={instructor.socialLinks.github} 
+                      href={creator.socialLinks.github} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
@@ -289,9 +303,9 @@ export default function InstructorPage({ params }: InstructorPageProps) {
                     </a>
                   )}
                   
-                  {instructor.socialLinks.youtube && (
+                  {creator.socialLinks.youtube && (
                     <a 
-                      href={instructor.socialLinks.youtube} 
+                      href={creator.socialLinks.youtube} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
@@ -302,9 +316,9 @@ export default function InstructorPage({ params }: InstructorPageProps) {
                     </a>
                   )}
                   
-                  {instructor.socialLinks.website && (
+                  {creator.socialLinks.website && (
                     <a 
-                      href={instructor.socialLinks.website} 
+                      href={creator.socialLinks.website} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"

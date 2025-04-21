@@ -146,6 +146,62 @@ Passionate about teaching complex concepts in simple ways, I've helped over 100,
   };
 };
 
+// Define proper interface for course data
+interface CourseData {
+  id: string;
+  title: string;
+  subtitle: string;
+  rating: number;
+  studentsCount: number;
+  reviewsCount: number;
+  lastUpdated: string;
+  language: string;
+  price: number;
+  originalPrice: number;
+  discount: number;
+  level: string;
+  duration: string;
+  certificateIncluded: boolean;
+  description: string;
+  highlights: string[];
+  requirements: string[];
+  whatYouWillLearn: string[];
+  thumbnail: string;
+  promoVideo: string;
+  instructor: {
+    id: string;
+    name: string;
+    avatar: string;
+    title: string;
+    rating: number;
+    coursesCount: number;
+    studentsCount: number;
+    reviewsCount: number;
+    bio: string;
+  };
+  curriculum: {
+    title: string;
+    lessons: {
+      id: string;
+      title: string;
+      duration: string;
+      preview: boolean;
+    }[];
+  }[];
+  reviews: {
+    id: string;
+    user: {
+      name: string;
+      avatar: string;
+    };
+    rating: number;
+    date: string;
+    content: string;
+    helpfulCount: number;
+  }[];
+  tags: string[];
+}
+
 interface CoursePageProps {
   params: {
     id: string;
@@ -154,16 +210,17 @@ interface CoursePageProps {
 
 export default function CoursePage({ params }: CoursePageProps) {
   const { id } = params;
-  const [course, setCourse] = useState<any>(null);
+  const [course, setCourse] = useState<CourseData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     try {
-      const courseData = getCourseDetails(id);
+      const courseData = getCourseDetails(id) as CourseData;
       setCourse(courseData);
       setLoading(false);
-    } catch (error) {
+    } catch (_) {
+      // Error is caught but not used
       setLoading(false);
       notFound();
     }

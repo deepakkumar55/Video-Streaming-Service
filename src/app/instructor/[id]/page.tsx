@@ -114,6 +114,12 @@ I've helped over ${(instructorId + 10) * 10000} students worldwide advance their
   };
 };
 
+interface InstructorData {
+  id: string;
+  name: string;
+  // Add other properties
+}
+
 interface InstructorPageProps {
   params: {
     id: string;
@@ -122,16 +128,16 @@ interface InstructorPageProps {
 
 export default function InstructorPage({ params }: InstructorPageProps) {
   const { id } = params;
-  const [instructor, setInstructor] = useState<any>(null);
+  const [instructor, setInstructor] = useState<InstructorData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('courses');
 
   useEffect(() => {
     try {
-      const instructorData = getInstructorDetails(id);
+      const instructorData = getInstructorDetails(id) as InstructorData;
       setInstructor(instructorData);
       setLoading(false);
-    } catch (error) {
+    } catch (_) {
       setLoading(false);
       notFound();
     }

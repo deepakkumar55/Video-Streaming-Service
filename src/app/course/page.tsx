@@ -138,12 +138,12 @@ export default function CoursesPage() {
     filterCourses(activeCategory, levelId);
   };
   
-  // Handle sort change
+  // Handle sort change - fix 'let' to 'const' for sorted variable
   const handleSortChange = (e) => {
     const value = e.target.value;
     setSortBy(value);
     
-    let sorted = [...filteredCourses];
+    const sorted = [...filteredCourses];
     
     if (value === 'popular') {
       sorted.sort((a, b) => b.studentsCount - a.studentsCount);
