@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import CertificationHeader from '@/components/certification/CertificationHeader';
 import CertificationOverview from '@/components/certification/CertificationOverview';
 import CertificationRequirements from '@/components/certification/CertificationRequirements';
@@ -470,6 +469,88 @@ This widely recognized credential will establish you as a qualified data science
   };
 };
 
+// Define proper interfaces for your data
+interface CertificationData {
+  name: string;
+  slug: string;
+  icon: string;
+  banner: string;
+  color: string;
+  description: string;
+  longDescription: string;
+  difficulty: string;
+  duration: string;
+  validityPeriod: string;
+  cost: string;
+  passRate: string;
+  prerequisites: string[];
+  skills: string[];
+  examTopics: {
+    title: string;
+    percentage: number;
+    subtopics: string[];
+  }[];
+  examFormat: {
+    totalQuestions: number;
+    passingScore: number;
+    questionTypes: string[];
+    duration: string;
+    proctoring: string;
+    attempts: string;
+    languages: string[];
+  };
+  benefits: string[];
+  faqs: {
+    question: string;
+    answer: string;
+  }[];
+  recommendedCourses: RecommendedCourse[];
+  relatedCertifications: RelatedCertification[];
+  reviews: Review[];
+}
+
+interface RecommendedCourse {
+  id: string;
+  title: string;
+  thumbnail: string;
+  rating: number;
+  reviewsCount: number;
+  instructor: {
+    name: string;
+    avatar: string;
+    verified: boolean;
+  };
+  price: number;
+  originalPrice: number;
+  isBestseller: boolean;
+  level: string;
+  isOfficial: boolean;
+}
+
+interface RelatedCertification {
+  slug: string;
+  name: string;
+  icon: string;
+  description: string;
+  color: string;
+  difficulty: string;
+}
+
+interface Review {
+  id: string;
+  user: {
+    name: string;
+    avatar: string;
+    jobTitle: string;
+    company: string;
+  };
+  rating: number;
+  date: string;
+  content: string;
+  verified: boolean;
+  helpfulCount: number;
+}
+
 interface CertificationPageProps {
   params: {
     slug: string;
@@ -478,16 +559,17 @@ interface CertificationPageProps {
 
 export default function CertificationPage({ params }: CertificationPageProps) {
   const { slug } = params;
-  const [certification, setCertification] = useState<any>(null);
+  const [certification, setCertification] = useState<CertificationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   
   useEffect(() => {
     try {
-      const certificationData = getCertificationDetails(slug);
+      const certificationData = getCertificationDetails(slug) as CertificationData;
       setCertification(certificationData);
       setLoading(false);
-    } catch (error) {
+    } catch (_) {
+      // Error is caught but not used
       setLoading(false);
       notFound();
     }
