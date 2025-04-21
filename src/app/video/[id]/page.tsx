@@ -56,23 +56,52 @@ Join thousands of students who have transformed their careers with this top-rate
   };
 };
 
-interface VideoPageProps {
-  params: {
+// Define proper interface for video data
+interface VideoData {
+  id: string;
+  title: string;
+  views: number;
+  likes: number;
+  uploadDate: string;
+  description: string;
+  videoUrl: string;
+  thumbnail: string;
+  instructor: {
     id: string;
+    name: string;
+    avatar: string;
+    subscribers: string;
+    verified: boolean;
+    bio: string;
+    courses: number;
   };
+  tags: string[];
+  language: string;
+  difficulty: string;
+  chapters: {
+    id: string;
+    title: string;
+    duration: string;
+    completed: boolean;
+  }[];
 }
 
-export default function VideoPage({ params }: VideoPageProps) {
+// Fixed: Using correct Next.js App Router prop type
+export default function VideoPage({
+  params
+}: {
+  params: { id: string }
+}) {
   const { id } = params;
-  const [video, setVideo] = useState<any>(null);
+  const [video, setVideo] = useState<VideoData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     try {
-      const videoData = getVideoDetails(id);
+      const videoData = getVideoDetails(id) as VideoData;
       setVideo(videoData);
       setLoading(false);
-    } catch (error) {
+    } catch (_) {
       setLoading(false);
       notFound();
     }

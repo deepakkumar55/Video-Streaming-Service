@@ -430,24 +430,31 @@ This path is perfect for those who want maximum versatility in their skill set a
   };
 };
 
-interface LearningPathProps {
-  params: {
-    slug: string;
-  };
+// Define proper interface for learning path data
+interface LearningPathData {
+  // Add learning path data properties here
+  name: string;
+  slug: string;
+  // ...other properties
 }
 
-export default function LearningPathPage({ params }: LearningPathProps) {
+// Fixed: Using correct Next.js App Router prop type
+export default function LearningPathPage({
+  params
+}: {
+  params: { slug: string }
+}) {
   const { slug } = params;
-  const [path, setPath] = useState<any>(null);
+  const [path, setPath] = useState<LearningPathData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   
   useEffect(() => {
     try {
-      const pathData = getLearningPath(slug);
+      const pathData = getLearningPath(slug) as LearningPathData;
       setPath(pathData);
       setLoading(false);
-    } catch (error) {
+    } catch (_) {
       setLoading(false);
       notFound();
     }

@@ -74,24 +74,31 @@ By the end of this webinar, you'll have a deeper understanding of ${topic} and p
   };
 };
 
-interface LiveWebinarPageProps {
-  params: {
-    id: string;
-  };
+// Define proper interface for webinar data
+interface WebinarData {
+  // Add webinar data properties here
+  id: string;
+  title: string;
+  // ...other properties
 }
 
-export default function LiveWebinarPage({ params }: LiveWebinarPageProps) {
+// Fixed: Using correct Next.js App Router prop type
+export default function LiveWebinarPage({
+  params
+}: {
+  params: { id: string }
+}) {
   const { id } = params;
-  const [webinar, setWebinar] = useState<any>(null);
+  const [webinar, setWebinar] = useState<WebinarData | null>(null);
   const [loading, setLoading] = useState(true);
   const [registered, setRegistered] = useState(false);
   
   useEffect(() => {
     try {
-      const webinarData = getLiveWebinarDetails(id);
+      const webinarData = getLiveWebinarDetails(id) as WebinarData;
       setWebinar(webinarData);
       setLoading(false);
-    } catch (error) {
+    } catch (_) {
       setLoading(false);
       notFound();
     }

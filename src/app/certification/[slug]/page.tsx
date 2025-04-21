@@ -25,7 +25,6 @@ const getCertificationDetails = (slug: string) => {
       longDescription: `The React Developer Certification is designed to validate your skills in building real-world applications using React and its ecosystem. This certification is recognized by top tech companies and demonstrates your ability to create production-ready React applications.
 
 Through a rigorous examination process, you'll prove your understanding of React fundamentals, state management, hooks, context API, performance optimization, and best practices in modern React development.
-
 Earning this certification will open new career opportunities and establish you as a qualified React professional in the competitive job market.`,
       difficulty: 'Intermediate',
       duration: '4 hours',
@@ -77,8 +76,8 @@ Earning this certification will open new career opportunities and establish you 
           title: 'React Ecosystem',
           percentage: 20,
           subtopics: [
-            'React Router',
             'State Management (Redux/MobX)',
+            'React Router',
             'Form Handling',
             'API Integration',
             'Server-Side Rendering',
@@ -153,7 +152,6 @@ Earning this certification will open new career opportunities and establish you 
       longDescription: `The MERN Stack Developer Certification is designed for developers who want to prove their proficiency in building full-stack JavaScript applications using MongoDB, Express.js, React, and Node.js.
 
 This certification validates your ability to design and develop complete web applications from database to user interface using the most popular JavaScript technologies. You'll demonstrate your expertise in creating RESTful APIs, managing data with MongoDB, building interactive UIs with React, and implementing server-side logic with Node.js and Express.
-
 This industry-recognized credential will distinguish you as a qualified full-stack JavaScript developer capable of handling end-to-end application development.`,
       difficulty: 'Intermediate to Advanced',
       duration: '5 hours',
@@ -281,7 +279,6 @@ This industry-recognized credential will distinguish you as a qualified full-sta
       longDescription: `The Data Science Professional Certification validates your skills in collecting, analyzing and interpreting complex data to inform decision making. This certification demonstrates your proficiency in statistical analysis, machine learning algorithms, data visualization, and business intelligence.
 
 Designed for aspiring and practicing data scientists, this certification evaluates your ability to extract meaningful insights from data and communicate those insights effectively to stakeholders. You'll prove your competence in using Python, data science libraries, and machine learning techniques to solve real-world problems.
-
 This widely recognized credential will establish you as a qualified data science professional capable of driving data-backed decisions in any organization.`,
       difficulty: 'Advanced',
       duration: '6 hours',
@@ -409,9 +406,7 @@ This widely recognized credential will establish you as a qualified data science
   // Generate recommended courses
   const recommendedCourses = Array(4).fill(0).map((_, i) => ({
     id: `${slug}-prep-${i+1}`,
-    title: i === 0 
-      ? `${certifications[slug].name} Preparation Course` 
-      : `${['Advanced', 'Essential', 'Practical'][i % 3]} ${slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} ${['Skills', 'Development', 'Masterclass'][i % 3]}`,
+    title: i === 0 ? `${certifications[slug].name} Preparation Course` : `${['Advanced', 'Essential', 'Practical'][i % 3]} ${slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} ${['Skills', 'Development', 'Masterclass'][i % 3]}`,
     thumbnail: `/images/thumbnails/${slug}-${(i % 3) + 1}.jpg`,
     rating: 4.5 + (i % 10) * 0.05,
     reviewsCount: 845 + Math.floor(Math.random() * 3000),
@@ -426,7 +421,7 @@ This widely recognized credential will establish you as a qualified data science
     level: ["Intermediate", "Advanced", "All Levels"][i % 3],
     isOfficial: i === 0
   }));
-  
+
   // Generate related certifications
   const relatedCertifications = Object.keys(certifications)
     .filter(c => c !== slug)
@@ -438,7 +433,7 @@ This widely recognized credential will establish you as a qualified data science
       color: certifications[c].color,
       difficulty: certifications[c].difficulty
     }));
-  
+
   // Generate reviews
   const reviews = Array(5).fill(0).map((_, i) => ({
     id: `review-${slug}-${i+1}`,
@@ -451,8 +446,8 @@ This widely recognized credential will establish you as a qualified data science
     rating: 4 + (i % 2),
     date: `${Math.floor(Math.random() * 6) + 1} months ago`,
     content: [
-      "The certification was challenging but well worth the effort. The depth of knowledge tested is impressive and relevant to real-world scenarios I face in my job daily.",
       "Preparing for and passing this certification significantly improved my skills and helped me secure a new position with a 30% salary increase. The exam is tough but fair.",
+      "The certification was challenging but well worth the effort. The depth of knowledge tested is impressive and relevant to real-world scenarios I face in my job daily.",
       "This certification has been a game-changer for my career. The comprehensive coverage of topics forced me to learn concepts I had been avoiding, making me a much more well-rounded professional.",
       "The practical components of this certification make it stand out from others. Instead of just testing theory, it assessed my ability to apply knowledge to solve actual problems.",
       "One of the most respected certifications in the industry for good reason. Rigorous but fair, and the skills tested are exactly what employers are looking for."
@@ -551,13 +546,12 @@ interface Review {
   helpfulCount: number;
 }
 
-interface CertificationPageProps {
-  params: {
-    slug: string;
-  };
-}
-
-export default function CertificationPage({ params }: CertificationPageProps) {
+// Fixed: Using correct Next.js App Router prop type
+export default function CertificationPage({
+  params
+}: {
+  params: { slug: string }
+}) {
   const { slug } = params;
   const [certification, setCertification] = useState<CertificationData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -590,132 +584,136 @@ export default function CertificationPage({ params }: CertificationPageProps) {
   return (
     <div className="bg-white dark:bg-gray-900 min-h-screen pb-12">
       {/* Certification header with banner */}
-      <CertificationHeader 
-        name={certification.name}
-        description={certification.description}
-        banner={certification.banner}
-        icon={certification.icon}
-        color={certification.color}
-        difficulty={certification.difficulty}
-        duration={certification.duration}
-        cost={certification.cost}
-        validityPeriod={certification.validityPeriod}
-      />
-      
-      <div className="max-w-screen-xl mx-auto px-4 lg:px-8 pt-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            {/* Certification tabs for navigation */}
-            <CertificationTabs 
-              activeTab={activeTab} 
-              setActiveTab={setActiveTab}
-            />
-            
-            {/* Tab content */}
-            <div className="mt-6">
-              {activeTab === 'overview' && (
-                <CertificationOverview 
-                  description={certification.longDescription}
-                  skills={certification.skills}
-                  benefits={certification.benefits}
-                />
-              )}
-              
-              {activeTab === 'requirements' && (
-                <CertificationRequirements 
-                  prerequisites={certification.prerequisites}
-                  examTopics={certification.examTopics}
-                />
-              )}
-              
-              {activeTab === 'exam' && (
-                <CertificationExam 
-                  examFormat={certification.examFormat}
-                  passRate={certification.passRate}
-                  faqs={certification.faqs}
-                />
-              )}
-              
-              {activeTab === 'courses' && (
-                <CertificationCourses 
-                  courses={certification.recommendedCourses}
-                />
-              )}
-              
-              {activeTab === 'reviews' && (
-                <CertificationReviews 
-                  reviews={certification.reviews}
-                />
-              )}
-            </div>
-          </div>
+      {certification && (
+        <>
+          <CertificationHeader 
+            name={certification.name}
+            description={certification.description}
+            banner={certification.banner}
+            icon={certification.icon}
+            color={certification.color}
+            difficulty={certification.difficulty}
+            duration={certification.duration}
+            cost={certification.cost}
+            validityPeriod={certification.validityPeriod}
+          />
           
-          <div className="lg:col-span-1">
-            {/* Certification enrollment card */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 sticky top-24">
-              <h3 className="text-xl font-semibold mb-4">Certification Details</h3>
-              
-              <div className="space-y-4">
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Cost</span>
-                  <span className="font-semibold">{certification.cost}</span>
-                </div>
+          <div className="max-w-screen-xl mx-auto px-4 lg:px-8 pt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
+                {/* Certification tabs for navigation */}
+                <CertificationTabs 
+                  activeTab={activeTab} 
+                  setActiveTab={setActiveTab}
+                />
                 
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Difficulty</span>
-                  <span className="font-semibold">{certification.difficulty}</span>
-                </div>
-                
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Exam Duration</span>
-                  <span className="font-semibold">{certification.duration}</span>
-                </div>
-                
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Pass Rate</span>
-                  <span className="font-semibold">{certification.passRate}</span>
-                </div>
-                
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Validity Period</span>
-                  <span className="font-semibold">{certification.validityPeriod}</span>
+                {/* Tab content */}
+                <div className="mt-6">
+                  {activeTab === 'overview' && (
+                    <CertificationOverview 
+                      description={certification.longDescription}
+                      skills={certification.skills}
+                      benefits={certification.benefits}
+                    />
+                  )}
+                  
+                  {activeTab === 'requirements' && (
+                    <CertificationRequirements 
+                      prerequisites={certification.prerequisites}
+                      examTopics={certification.examTopics}
+                    />
+                  )}
+                  
+                  {activeTab === 'exam' && (
+                    <CertificationExam 
+                      examFormat={certification.examFormat}
+                      passRate={certification.passRate}
+                      faqs={certification.faqs}
+                    />
+                  )}
+                  
+                  {activeTab === 'courses' && (
+                    <CertificationCourses 
+                      courses={certification.recommendedCourses}
+                    />
+                  )}
+                  
+                  {activeTab === 'reviews' && (
+                    <CertificationReviews 
+                      reviews={certification.reviews}
+                    />
+                  )}
                 </div>
               </div>
               
-              <div className="mt-6 space-y-4">
-                <button className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors">
-                  Register for Exam
-                </button>
+              <div className="lg:col-span-1">
+                {/* Certification enrollment card */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 sticky top-24">
+                  <h3 className="text-xl font-semibold mb-4">Certification Details</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-400">Cost</span>
+                      <span className="font-semibold">{certification.cost}</span>
+                    </div>
+                    
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-400">Difficulty</span>
+                      <span className="font-semibold">{certification.difficulty}</span>
+                    </div>
+                    
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-400">Exam Duration</span>
+                      <span className="font-semibold">{certification.duration}</span>
+                    </div>
+                    
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-400">Pass Rate</span>
+                      <span className="font-semibold">{certification.passRate}</span>
+                    </div>
+                    
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-400">Validity Period</span>
+                      <span className="font-semibold">{certification.validityPeriod}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6 space-y-4">
+                    <button className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors">
+                      Register for Exam
+                    </button>
+                    
+                    <button className="w-full py-3 border border-indigo-600 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:border-indigo-400 dark:hover:bg-indigo-900/20 font-medium rounded-lg transition-colors">
+                      Get Preparation Course
+                    </button>
+                  </div>
+                  
+                  <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <h4 className="font-medium mb-3">Why Get Certified?</h4>
+                    <ul className="space-y-2">
+                      {certification.benefits.slice(0, 3).map((benefit, index) => (
+                        <li key={index} className="flex items-start">
+                          <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span className="text-gray-700 dark:text-gray-300">{benefit}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
                 
-                <button className="w-full py-3 border border-indigo-600 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:border-indigo-400 dark:hover:bg-indigo-900/20 font-medium rounded-lg transition-colors">
-                  Get Preparation Course
-                </button>
+                {/* Related certifications */}
+                <div className="mt-6">
+                  <CertificationRelated 
+                    certifications={certification.relatedCertifications}
+                  />
+                </div>
               </div>
-              
-              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h4 className="font-medium mb-3">Why Get Certified?</h4>
-                <ul className="space-y-2">
-                  {certification.benefits.slice(0, 3).map((benefit, index) => (
-                    <li key={index} className="flex items-start">
-                      <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-gray-700 dark:text-gray-300">{benefit}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            
-            {/* Related certifications */}
-            <div className="mt-6">
-              <CertificationRelated 
-                certifications={certification.relatedCertifications}
-              />
             </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }
