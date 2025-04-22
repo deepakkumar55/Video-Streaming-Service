@@ -545,7 +545,12 @@ interface Review {
 }
 
 // Fix the type definition for the page component
-export default function CertificationPage({ params }: { params: { slug: string } }) {
+type PageProps = {
+  params: { slug: string }
+  searchParams?: { [key: string]: string | string[] | undefined }
+}
+
+export default function CertificationPage({ params }: PageProps) {
   // Instead of using client-side state, get the data server-side
   const slug = params.slug;
   const certificationData = getCertificationDetails(slug) as CertificationData;
@@ -574,7 +579,7 @@ export default function CertificationPage({ params }: { params: { slug: string }
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             {/* Client component that handles its own state */}
-            <CertificationTabsContainer 
+            <CertificationTabs 
               certification={certificationData}
             />
           </div>
