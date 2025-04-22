@@ -1,5 +1,8 @@
-import React from 'react';
+"use client";
+
+import React, { useState } from 'react';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import CertificationHeader from '@/components/certification/CertificationHeader';
 import CertificationOverview from '@/components/certification/CertificationOverview';
 import CertificationRequirements from '@/components/certification/CertificationRequirements';
@@ -7,7 +10,6 @@ import CertificationExam from '@/components/certification/CertificationExam';
 import CertificationCourses from '@/components/certification/CertificationCourses';
 import CertificationReviews from '@/components/certification/CertificationReviews';
 import CertificationRelated from '@/components/certification/CertificationRelated';
-import CertificationTabs from '@/components/certification/CertificationTabs';
 
 // Mock data fetch function
 const getCertificationDetails = (slug: string) => {
@@ -555,9 +557,80 @@ export default function CertificationPage({ params }: PageProps) {
   const slug = params.slug;
   const certificationData = getCertificationDetails(slug) as CertificationData;
   
+  // Add state for active tab (making this a client component)
+  const [activeTab, setActiveTab] = useState('overview');
+  
   if (!certificationData) {
     return notFound();
   }
+
+  // Tab navigation component
+  const TabNavigation = () => (
+    <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
+      <ul className="flex flex-wrap -mb-px text-sm font-medium text-center">
+        <li className="mr-2">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`inline-block p-4 rounded-t-lg ${
+              activeTab === 'overview'
+                ? 'text-indigo-600 border-b-2 border-indigo-600 dark:text-indigo-400 dark:border-indigo-400'
+                : 'text-gray-500 hover:text-gray-600 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            Overview
+          </button>
+        </li>
+        <li className="mr-2">
+          <button
+            onClick={() => setActiveTab('requirements')}
+            className={`inline-block p-4 rounded-t-lg ${
+              activeTab === 'requirements'
+                ? 'text-indigo-600 border-b-2 border-indigo-600 dark:text-indigo-400 dark:border-indigo-400'
+                : 'text-gray-500 hover:text-gray-600 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            Requirements
+          </button>
+        </li>
+        <li className="mr-2">
+          <button
+            onClick={() => setActiveTab('exam')}
+            className={`inline-block p-4 rounded-t-lg ${
+              activeTab === 'exam'
+                ? 'text-indigo-600 border-b-2 border-indigo-600 dark:text-indigo-400 dark:border-indigo-400'
+                : 'text-gray-500 hover:text-gray-600 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            Exam Details
+          </button>
+        </li>
+        <li className="mr-2">
+          <button
+            onClick={() => setActiveTab('preparation')}
+            className={`inline-block p-4 rounded-t-lg ${
+              activeTab === 'preparation'
+                ? 'text-indigo-600 border-b-2 border-indigo-600 dark:text-indigo-400 dark:border-indigo-400'
+                : 'text-gray-500 hover:text-gray-600 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            Preparation
+          </button>
+        </li>
+        <li>
+          <button
+            onClick={() => setActiveTab('reviews')}
+            className={`inline-block p-4 rounded-t-lg ${
+              activeTab === 'reviews'
+                ? 'text-indigo-600 border-b-2 border-indigo-600 dark:text-indigo-400 dark:border-indigo-400'
+                : 'text-gray-500 hover:text-gray-600 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            Reviews
+          </button>
+        </li>
+      </ul>
+    </div>
+  );
 
   // Use client components for interactive elements
   return (
@@ -578,10 +651,331 @@ export default function CertificationPage({ params }: PageProps) {
       <div className="max-w-screen-xl mx-auto px-4 lg:px-8 pt-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            {/* Client component that handles its own state */}
-            <CertificationTabs 
-              certification={certificationData}
-            />
+            {/* Tab navigation */}
+            <TabNavigation />
+            
+            {/* Tab content */}
+            <div className="mt-6">
+              {activeTab === 'overview' && (
+                <div className="space-y-8">
+                  <div>
+                    <h2 className="text-xl font-semibold mb-4">About this Certification</h2>
+                    <div className="prose prose-indigo dark:prose-invert max-w-none">
+                      <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">{certificationData.longDescription}</p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h2 className="text-xl font-semibold mb-4">Skills You'll Gain</h2>
+                    <div className="flex flex-wrap gap-2">
+                      {certificationData.skills.map((skill, index) => (
+                        <span key={index} className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h2 className="text-xl font-semibold mb-4">Benefits of Certification</h2>
+                    <ul className="space-y-3">
+                      {certificationData.benefits.map((benefit, index) => (
+                        <li key={index} className="flex items-start">
+                          <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span className="text-gray-700 dark:text-gray-300">{benefit}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+              
+              {activeTab === 'requirements' && (
+                <div className="space-y-8">
+                  <div>
+                    <h2 className="text-xl font-semibold mb-4">Prerequisites</h2>
+                    <ul className="space-y-3">
+                      {certificationData.prerequisites.map((prerequisite, index) => (
+                        <li key={index} className="flex items-start">
+                          <svg className="w-5 h-5 text-blue-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span className="text-gray-700 dark:text-gray-300">{prerequisite}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h2 className="text-xl font-semibold mb-4">Required Skills</h2>
+                    <p className="text-gray-700 dark:text-gray-300 mb-4">
+                      To successfully complete this certification, you should be proficient in the following areas:
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {certificationData.skills.map((skill, index) => (
+                        <div key={index} className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
+                          <span className="text-gray-800 dark:text-gray-200">{skill}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {activeTab === 'exam' && (
+                <div className="space-y-8">
+                  <div>
+                    <h2 className="text-xl font-semibold mb-4">Exam Format</h2>
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 border border-gray-100 dark:border-gray-700">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex items-start">
+                          <span className="text-gray-600 dark:text-gray-400 min-w-[160px]">Total Questions:</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{certificationData.examFormat.totalQuestions}</span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="text-gray-600 dark:text-gray-400 min-w-[160px]">Passing Score:</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{certificationData.examFormat.passingScore}%</span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="text-gray-600 dark:text-gray-400 min-w-[160px]">Duration:</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{certificationData.examFormat.duration}</span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="text-gray-600 dark:text-gray-400 min-w-[160px]">Proctoring:</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{certificationData.examFormat.proctoring}</span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="text-gray-600 dark:text-gray-400 min-w-[160px]">Attempts:</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{certificationData.examFormat.attempts}</span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="text-gray-600 dark:text-gray-400 min-w-[160px]">Languages:</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{certificationData.examFormat.languages.join(', ')}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-6">
+                        <h3 className="font-medium text-gray-900 dark:text-white mb-2">Question Types:</h3>
+                        <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1">
+                          {certificationData.examFormat.questionTypes.map((type, index) => (
+                            <li key={index}>{type}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h2 className="text-xl font-semibold mb-4">Exam Topics</h2>
+                    <div className="space-y-4">
+                      {certificationData.examTopics.map((topic, index) => (
+                        <div key={index} className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
+                          <div className="flex justify-between items-center mb-2">
+                            <h3 className="font-medium text-gray-900 dark:text-white">{topic.title}</h3>
+                            <span className="bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 text-xs font-medium px-2.5 py-0.5 rounded">
+                              {topic.percentage}% of exam
+                            </span>
+                          </div>
+                          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
+                            {topic.subtopics.map((subtopic, idx) => (
+                              <li key={idx} className="flex items-center text-gray-700 dark:text-gray-300 text-sm">
+                                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full mr-2"></span>
+                                {subtopic}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {activeTab === 'preparation' && (
+                <div className="space-y-8">
+                  <h2 className="text-xl font-semibold mb-4">Preparation Resources</h2>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {certificationData.recommendedCourses.map((course, index) => (
+                      <div key={index} className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <div className="relative aspect-video">
+                          <img 
+                            src={course.thumbnail} 
+                            alt={course.title} 
+                            className="object-cover w-full h-full"
+                          />
+                          {course.isOfficial && (
+                            <div className="absolute top-2 left-2 bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded">
+                              OFFICIAL COURSE
+                            </div>
+                          )}
+                          {course.isBestseller && !course.isOfficial && (
+                            <div className="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded">
+                              BESTSELLER
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="p-4">
+                          <h3 className="font-medium text-gray-900 dark:text-white mb-2 line-clamp-2">
+                            {course.title}
+                          </h3>
+                          
+                          <div className="flex items-center mb-2">
+                            <span className="text-sm font-medium text-gray-900 dark:text-white mr-1">
+                              {course.rating.toFixed(1)}
+                            </span>
+                            <div className="flex">
+                              {[...Array(5)].map((_, i) => (
+                                <svg
+                                  key={i}
+                                  className={`w-4 h-4 ${i < Math.floor(course.rating) ? 'text-yellow-400' : 'text-gray-300'}`}
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                              ))}
+                            </div>
+                            <span className="text-xs text-gray-600 dark:text-gray-400 ml-1">
+                              ({course.reviewsCount.toLocaleString()})
+                            </span>
+                          </div>
+                          
+                          <div className="flex items-center text-sm mb-2">
+                            <img 
+                              src={course.instructor.avatar}
+                              alt={course.instructor.name}
+                              className="w-6 h-6 rounded-full mr-2"
+                            />
+                            <span className="text-gray-700 dark:text-gray-300">
+                              {course.instructor.name}
+                            </span>
+                          </div>
+                          
+                          <div className="flex items-center justify-between mt-2">
+                            <div>
+                              <span className="text-lg font-bold text-gray-900 dark:text-white">₹{course.price}</span>
+                              <span className="ml-2 text-sm text-gray-500 dark:text-gray-400 line-through">₹{course.originalPrice}</span>
+                            </div>
+                            <span className="text-xs text-gray-600 dark:text-gray-400 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">
+                              {course.level}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-6 border border-indigo-100 dark:border-indigo-800">
+                    <h3 className="text-lg font-semibold text-indigo-900 dark:text-indigo-300 mb-3">
+                      Preparation Tips
+                    </h3>
+                    <ul className="space-y-3">
+                      <li className="flex items-start">
+                        <svg className="w-5 h-5 text-indigo-700 dark:text-indigo-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        <span className="text-gray-800 dark:text-gray-200">Take the official preparation course to cover all exam topics systematically</span>
+                      </li>
+                      <li className="flex items-start">
+                        <svg className="w-5 h-5 text-indigo-700 dark:text-indigo-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        <span className="text-gray-800 dark:text-gray-200">Practice with sample questions and mock exams to get familiar with the format</span>
+                      </li>
+                      <li className="flex items-start">
+                        <svg className="w-5 h-5 text-indigo-700 dark:text-indigo-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        <span className="text-gray-800 dark:text-gray-200">Join study groups or forums to discuss challenging concepts with peers</span>
+                      </li>
+                      <li className="flex items-start">
+                        <svg className="w-5 h-5 text-indigo-700 dark:text-indigo-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        <span className="text-gray-800 dark:text-gray-200">Focus on hands-on practice to reinforce theoretical knowledge</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+              
+              {activeTab === 'reviews' && (
+                <div className="space-y-8">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-semibold">Student Reviews</h2>
+                    <button className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium">
+                      Write a Review
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    {certificationData.reviews.map((review, index) => (
+                      <div key={index} className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <div className="flex items-start">
+                          <img 
+                            src={review.user.avatar}
+                            alt={review.user.name}
+                            className="w-10 h-10 rounded-full mr-4"
+                          />
+                          <div>
+                            <div className="flex items-center">
+                              <h3 className="font-medium text-gray-900 dark:text-white mr-2">
+                                {review.user.name}
+                              </h3>
+                              {review.verified && (
+                                <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
+                                  Verified
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {review.user.jobTitle} at {review.user.company}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-4">
+                          <div className="flex items-center mb-2">
+                            <div className="flex mr-2">
+                              {[...Array(5)].map((_, i) => (
+                                <svg
+                                  key={i}
+                                  className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                              ))}
+                            </div>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                              {review.date}
+                            </span>
+                          </div>
+                          
+                          <p className="text-gray-700 dark:text-gray-300">
+                            {review.content}
+                          </p>
+                          
+                          <div className="flex items-center mt-4">
+                            <button className="flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                              </svg>
+                              Helpful ({review.helpfulCount})
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           
           <div className="lg:col-span-1">
@@ -590,38 +984,44 @@ export default function CertificationPage({ params }: PageProps) {
               <h3 className="text-xl font-semibold mb-4">Certification Details</h3>
               
               <div className="space-y-4">
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400">Cost</span>
-                  <span className="font-semibold">{certificationData.cost}</span>
+                  <span className="font-semibold text-indigo-600 dark:text-indigo-400">{certificationData.cost}</span>
                 </div>
                 
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400">Difficulty</span>
                   <span className="font-semibold">{certificationData.difficulty}</span>
                 </div>
                 
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400">Exam Duration</span>
                   <span className="font-semibold">{certificationData.duration}</span>
                 </div>
                 
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400">Pass Rate</span>
                   <span className="font-semibold">{certificationData.passRate}</span>
                 </div>
                 
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
                   <span className="text-gray-600 dark:text-gray-400">Validity Period</span>
                   <span className="font-semibold">{certificationData.validityPeriod}</span>
                 </div>
               </div>
               
               <div className="mt-6 space-y-4">
-                <button className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors">
+                <button className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                  </svg>
                   Register for Exam
                 </button>
                 
-                <button className="w-full py-3 border border-indigo-600 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:border-indigo-400 dark:hover:bg-indigo-900/20 font-medium rounded-lg transition-colors">
+                <button className="w-full py-3 border border-indigo-600 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:border-indigo-400 dark:hover:bg-indigo-900/20 font-medium rounded-lg transition-colors flex items-center justify-center">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                  </svg>
                   Get Preparation Course
                 </button>
               </div>
@@ -631,15 +1031,90 @@ export default function CertificationPage({ params }: PageProps) {
                 <ul className="space-y-2">
                   {certificationData.benefits.slice(0, 3).map((benefit, index) => (
                     <li key={index} className="flex items-start">
-                      <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-gray-700 dark:text-gray-300">{benefit}</span>
+                      <span className="text-gray-700 dark:text-gray-300 text-sm">{benefit}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             </div>
+            
+            {/* Recommended preparation course card */}
+            {certificationData.recommendedCourses && certificationData.recommendedCourses.length > 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 mt-6">
+                <h3 className="text-xl font-semibold mb-4">Recommended Preparation</h3>
+                <div className="space-y-4">
+                  <div className="relative aspect-video rounded-lg overflow-hidden">
+                    {certificationData.recommendedCourses[0].thumbnail && (
+                      <img
+                        src={certificationData.recommendedCourses[0].thumbnail}
+                        alt={certificationData.recommendedCourses[0].title}
+                        className="object-cover w-full h-full"
+                      />
+                    )}
+                    {certificationData.recommendedCourses[0].isOfficial && (
+                      <div className="absolute top-2 left-2 bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded">
+                        OFFICIAL COURSE
+                      </div>
+                    )}
+                  </div>
+                  
+                  <h4 className="font-semibold text-gray-900 dark:text-white">
+                    {certificationData.recommendedCourses[0].title}
+                  </h4>
+                  
+                  <div className="flex items-center">
+                    <div className="flex items-center">
+                      <span className="text-sm font-medium text-gray-900 dark:text-white mr-1">
+                        {certificationData.recommendedCourses[0].rating.toFixed(1)}
+                      </span>
+                      <div className="flex">
+                        {[...Array(5)].map((_, i) => (
+                          <svg
+                            key={i}
+                            className={`w-4 h-4 ${i < Math.floor(certificationData.recommendedCourses[0].rating) ? 'text-yellow-400' : 'text-gray-300'}`}
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        ))}
+                      </div>
+                      <span className="text-sm text-gray-600 dark:text-gray-400 ml-1">
+                        ({certificationData.recommendedCourses[0].reviewsCount.toLocaleString()})
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center text-sm">
+                    <img 
+                      src={certificationData.recommendedCourses[0].instructor.avatar} 
+                      alt={certificationData.recommendedCourses[0].instructor.name}
+                      className="w-6 h-6 rounded-full mr-2"
+                    />
+                    <span className="text-gray-700 dark:text-gray-300">
+                      {certificationData.recommendedCourses[0].instructor.name}
+                      {certificationData.recommendedCourses[0].instructor.verified && (
+                        <svg className="w-4 h-4 text-blue-500 ml-1 inline" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <span className="text-lg font-bold text-gray-900 dark:text-white">₹{certificationData.recommendedCourses[0].price}</span>
+                    <span className="ml-2 text-sm text-gray-500 dark:text-gray-400 line-through">₹{certificationData.recommendedCourses[0].originalPrice}</span>
+                  </div>
+                  
+                  <button className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors">
+                    Enroll Now
+                  </button>
+                </div>
+              </div>
+            )}
             
             {/* Related certifications */}
             <div className="mt-6">
